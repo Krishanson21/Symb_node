@@ -2,10 +2,22 @@ import { Request, Response } from "express"
 import User from "../models/user.model"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import { registerSchema } from "../utils/validation"
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body
+    const result = registerSchema.safeParse(req.body)
+
+    if (!result.success) {
+      return res.status(400).json({
+        errors: result.error.issues.map(e => ({
+          field: e.path[0],
+          message: e.message
+        }))
+      })
+    }
+
+    const { name, email, password } = result.data
 
     const oldUser = await User.findOne({ email })
 
@@ -23,12 +35,10 @@ export const register = async (req: Request, res: Response) => {
 
     res.status(201).json({
       message: "User created",
-      user: user
+      user
     })
   } catch (err: any) {
-    res.status(500).json({
-      message: "Something went wrong"
-    })
+    res.status(500).json({ message: "Something went wrong" })
   }
 }
 
@@ -66,4 +76,4 @@ export const login = async (req: Request, res: Response) => {
   }
 }
 
-export {}
+export { }

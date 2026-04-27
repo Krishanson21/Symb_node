@@ -1,8 +1,20 @@
 import { Request, Response } from "express"
 import Task from "../models/task.model"
+import { taskSchema } from "../utils/validation"
 
 export const createTask = async (req: any, res: Response) => {
   try {
+    const result = taskSchema.safeParse(req.body)
+
+    if (!result.success) {
+      return res.status(400).json({
+        errors: result.error.issues.map(e => ({
+          field: e.path[0] || "unknown",
+          message: e.message
+        }))
+      })
+    }
+
     const { title, description, status, priority, dueDate } = req.body
 
     const task = await Task.create({
@@ -55,6 +67,17 @@ export const getTaskById = async (req: any, res: Response) => {
 
 export const updateTask = async (req: any, res: Response) => {
   try {
+    const result = taskSchema.safeParse(req.body)
+
+    if (!result.success) {
+      return res.status(400).json({
+        errors: result.error.issues.map(e => ({
+          field: e.path[0] || "unknown",
+          message: e.message
+        }))
+      })
+    }
+
     const task = await Task.findOneAndUpdate(
       {
         _id: req.params.id,
@@ -118,4 +141,4 @@ export const getTaskAnalytics = async (req: any, res: Response) => {
     res.status(500).json({ message: "Error getting analytics" })
   }
 }
-export{}
+export { }
