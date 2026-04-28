@@ -8,6 +8,8 @@ import authRoutes from "./routes/auth.routes"
 import taskRoutes from "./routes/task.routes"
 import userRoutes from "./routes/user.routes"
 import analyticsRoutes from "./routes/analytics.routes"
+import swaggerUi from "swagger-ui-express"
+import { swaggerSpec } from "./config/swagger"
 
 
 
@@ -15,6 +17,7 @@ dotenv.config();
 // console.log("MONGO:", process.env.MONGO_URI);
 const app = express();
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.use(express.json());
 app.use(cors());
